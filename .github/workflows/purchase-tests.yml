@@ -66,6 +66,7 @@ jobs:
           path: |
             target/surefire-reports/
             target/cucumber.html
+            report/
             reportss/
           if-no-files-found: ignore
           retention-days: 7

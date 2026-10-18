@@ -111,15 +111,15 @@ mvn --batch-mode --no-transfer-progress -DfailIfNoTests=true -Dapp.env=%APP_ENV%
 ```
 
 Publish `target/surefire-reports/TEST-*.xml` with the JUnit test-result
-publisher, and archive `target/surefire-reports/**,target/cucumber.html,reportss/**`.
+publisher, and archive `target/surefire-reports/**,target/cucumber.html,report/**,reportss/**`.
 Use `HEADLESS=true` when Jenkins runs as a Windows service without an
 interactive desktop session.
 
 TestNG/Surefire reports are written under `target/surefire-reports/`, the
 Cucumber HTML report under `target/cucumber.html`, and a uniquely named Extent
-HTML report is generated under `reportss/` for each TestNG or Cucumber test
-execution. Failure screenshots are also saved under `reportss/`. CI pipelines
-archive these outputs.
+HTML report is generated under `report/` for each TestNG or Cucumber test
+execution. Failure screenshots are saved under `reportss/`. CI pipelines
+archive both output directories.
 
 Run `mvn -P LinkValidation test` to check HTTP(S) links on the authenticated
 product dashboard. Purchase tests also save product-card element screenshots

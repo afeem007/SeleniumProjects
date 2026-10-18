@@ -15,7 +15,7 @@ import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 public class ExtentReporterNG {
 
 	public static ExtentReports getReportObject() {
-		Path reportDirectory = Paths.get(System.getProperty("user.dir"), "reportss");
+		Path reportDirectory = Paths.get(System.getProperty("user.dir"), "report");
 		try {
 			Files.createDirectories(reportDirectory);
 		} catch (IOException e) {
@@ -30,7 +30,7 @@ public class ExtentReporterNG {
 		reporter.config().setDocumentTitle("Test Results");
 		ExtentReports extent = new ExtentReports();
 		extent.attachReporter(reporter);
-		extent.setSystemInfo("Tester", "Arun kumar Chauhan");
+		extent.setSystemInfo("Tester", "shahil anand");
 		return extent;
 	}
 }

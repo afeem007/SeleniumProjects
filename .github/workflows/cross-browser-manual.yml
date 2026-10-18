@@ -44,6 +44,7 @@ jobs:
           name: purchase-${{ matrix.browser }}-reports
           path: |
             target/surefire-reports/
+            report/
             reportss/
           if-no-files-found: ignore
           retention-days: 7
