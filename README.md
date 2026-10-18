@@ -37,8 +37,13 @@ are intentionally not included.
 - Maven 3.9 or later
 - Chrome, Edge, or Firefox for local runs
 
-WebDriverManager downloads the matching browser driver. The selected browser
-itself must be installed on the machine running the tests.
+WebDriverManager resolves and downloads the matching Chrome and Firefox
+drivers. Selenium Manager (included with Selenium) normally resolves the Edge
+driver. If its download endpoint is unavailable, download the matching Edge
+WebDriver from [Microsoft's official download page](https://developer.microsoft.com/microsoft-edge/tools/webdriver/)
+and set `EDGE_DRIVER_PATH` in `.env` to the full path of `msedgedriver.exe`.
+The first three version components of Edge and Edge WebDriver must match. The
+selected browser itself must be installed on the machine running the tests.
 
 ## Local configuration
 
@@ -51,7 +56,19 @@ environment credentials or product data fail with a clear configuration error.
 
 The QA and Dev base URL values currently point to the same application URL.
 Set `BROWSER` to `chrome`, `edge`, or `firefox`, and `HEADLESS` to `true` or
-`false`.
+`false`. For example, to run headless Edge against QA, set these entries in
+`.env`:
+
+```text
+APP_ENV=qa
+BROWSER=edge
+HEADLESS=true
+```
+
+The test setup loads `.env` automatically. You do not need to set PowerShell
+`$env:` variables for local runs. Explicit Maven system properties override
+`.env`; otherwise, `.env` values take precedence over inherited environment
+variables.
 
 Run suites from the project root:
 
@@ -69,12 +86,6 @@ scenario. To run one Cucumber scenario by name:
 
 ```powershell
 mvn -P CucumberTests test "-Dcucumber.filter.name=Scenario name"
-```
-
-Maven properties can override corresponding environment values, for example:
-
-```powershell
-mvn -P Purchase test "-Dapp.env=qa" "-Dbrowser=chrome" "-Dheadless=true"
 ```
 
 ## CI credentials and reports

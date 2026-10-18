@@ -22,6 +22,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -71,16 +72,24 @@ public class BaseTest {
 	            options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
 	        }
 	        driver = new ChromeDriver(options);
-	        driver.manage().window().setSize(new Dimension(1440, 900));
-
 	    } else if (browserName.equalsIgnoreCase("edge")) {
-	        WebDriverManager.edgedriver().setup();
 	        EdgeOptions options = new EdgeOptions();
 	        if (headless) {
 	            options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
 	        }
-	        driver = new EdgeDriver(options);
-
+	        String edgeDriverPath = getSetting(settings, "EDGE_DRIVER_PATH", "edge.driver.path", null);
+	        if (edgeDriverPath == null || edgeDriverPath.isBlank()) {
+	            driver = new EdgeDriver(options);
+	        } else {
+	            Path executable = Paths.get(edgeDriverPath).toAbsolutePath().normalize();
+	            if (!Files.isRegularFile(executable)) {
+	                throw new IOException("EDGE_DRIVER_PATH does not point to a driver file: " + executable);
+	            }
+	            EdgeDriverService service = new EdgeDriverService.Builder()
+	                    .usingDriverExecutable(executable.toFile())
+	                    .build();
+	            driver = new EdgeDriver(service, options);
+	        }
 	    } else if (browserName.equalsIgnoreCase("firefox")) {
 	        WebDriverManager.firefoxdriver().setup();
 	        FirefoxOptions options = new FirefoxOptions();
@@ -93,7 +102,9 @@ public class BaseTest {
 	                + ". Set BROWSER to chrome, edge, or firefox.");
 	    }
 
-	    if (!headless) {
+	    if (headless) {
+	        driver.manage().window().setSize(new Dimension(1440, 900));
+	    } else {
 	        driver.manage().window().maximize();
 	    }
 	    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
@@ -114,10 +125,10 @@ public class BaseTest {
 	private String getSetting(Properties settings, String environmentKey, String systemProperty, String defaultValue) {
 		String value = System.getProperty(systemProperty);
 		if (value == null || value.isBlank()) {
-			value = System.getenv(environmentKey);
+			value = settings.getProperty(environmentKey);
 		}
 		if (value == null || value.isBlank()) {
-			value = settings.getProperty(environmentKey);
+			value = System.getenv(environmentKey);
 		}
 		return value == null || value.isBlank() ? defaultValue : value;
 	}
