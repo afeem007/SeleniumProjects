@@ -15,22 +15,22 @@ import SeleniumFramworkDesign.utils.ExtentReporterNG;
 
 public class Listeners implements ITestListener {
 	ExtentReports extent = ExtentReporterNG.getReportObject(); // calling report method
-	ThreadLocal<ExtentTest> Extenttest = new ThreadLocal<ExtentTest>();
+	ThreadLocal<ExtentTest> extentTest = new ThreadLocal<ExtentTest>();
 
 	@Override
 	public void onTestStart(ITestResult result) {
 		ExtentTest test = extent.createTest(result.getMethod().getMethodName());
-		Extenttest.set(test);
+		extentTest.set(test);
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		Extenttest.get().log(Status.PASS, "Test Passed");
+		getOrCreateTest(result).log(Status.PASS, "Test Passed");
 	}
 
 	@Override
 	public void onTestFailure(ITestResult result) {
-		ExtentTest currentTest = Extenttest.get();
+		ExtentTest currentTest = getOrCreateTest(result);
 		currentTest.log(Status.FAIL, "Test Failed");
 		currentTest.fail(result.getThrowable());
 
@@ -54,8 +54,26 @@ public class Listeners implements ITestListener {
 	}
 
 	@Override
+	public void onTestSkipped(ITestResult result) {
+		ExtentTest currentTest = getOrCreateTest(result);
+		currentTest.log(Status.SKIP, "Test skipped");
+		if (result.getThrowable() != null) {
+			currentTest.skip(result.getThrowable());
+		}
+	}
+
+	@Override
 	public void onFinish(ITestContext context) {
 		extent.flush();
+	}
+
+	private ExtentTest getOrCreateTest(ITestResult result) {
+		ExtentTest currentTest = extentTest.get();
+		if (currentTest == null) {
+			currentTest = extent.createTest(result.getMethod().getMethodName());
+			extentTest.set(currentTest);
+		}
+		return currentTest;
 	}
 
 }

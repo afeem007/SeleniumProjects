@@ -13,6 +13,7 @@ import io.cucumber.testng.PickleWrapper;
 				 tags="@Regression",
 				 monochrome=true,
 				 plugin= {"html:target/cucumber.html"})
+@org.testng.annotations.Listeners(SeleniumFramworkDesign.base.Listeners.class)
 public class TestNGTestRunner extends AbstractTestNGCucumberTests{
 	@Override
 	@Test(groups = "cucumber", description = "Runs Cucumber scenarios", dataProvider = "scenarios",
